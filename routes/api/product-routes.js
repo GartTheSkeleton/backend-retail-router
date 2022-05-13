@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { json } = require('express/lib/response');
 const { Product, Category, Tag, ProductTag } = require('../../models');
 
 // The `/api/products` endpoint
@@ -12,8 +13,12 @@ router.get('/', (req, res) => {
     order: [['id', 'ASC']],
     include: [
       {
-        model: Category,
-        attributes: ['category_name']
+        model: Category
+      },
+      {
+        model: Tag,
+        through: ProductTag,
+        as: 'product_tags'
       }
     ]
   }).then(dbProductData => res.json(dbProductData))
@@ -34,10 +39,13 @@ router.get('/:id', (req, res) => {
     attributes: ['id', 'product_name', 'price', 'stock'],
     include: [
       {
-        model: Category,
-        attributes: ['category_name']
+        model: Category
+      },
+      {
+        model: Tag,
+        through: ProductTag,
+        as: 'product_tags'
       }
-      //ASSOCIATE TAGS
     ]
   }).then(dbProductData => {
     if (!dbProductData) {
